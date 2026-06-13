@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Framework Features">
+<title>Framework Features — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Overview</div>
+    <h1>Framework Features — in depth</h1>
+    <p>Every capability, each owned by one module with one responsibility, each verified by an
+    automated gate.</p>
+  </div>
+
+  <h2 class="sec reveal">Capability Catalog</h2>
+  <div class="grid c2">
+    <div class="card glass flag reveal"><h3>🎛 Runner Manager</h3>
+      <p>External run control: SQLite drives which tests run, in what priority order, with what descriptions and data-iteration counts. Collection-time interception means dropped tests are never even registered.</p>
+      <div class="where">runner/ · DATASOURCE=db</div></div>
+    <div class="card glass reveal"><h3>🏥 Multi-tenant matrix</h3>
+      <p>5 EMR sandboxes × 4 clinical roles = 20 legs from one command, discovered dynamically from
+      the credentials backend — add a tenant's users and it joins the matrix with zero config.</p>
+      <div class="where">npm run test:matrix</div></div>
+    <div class="card glass reveal"><h3>👥 Per-role concurrent sessions</h3>
+      <p>Cross-role clinical workflows in one test: <code class="inline">coordinatorPage</code> schedules
+      while <code class="inline">surgeonPage</code> reviews — isolated, pre-authenticated contexts.</p>
+      <div class="where">fixtures/auth.fixture.ts</div></div>
+    <div class="card glass reveal"><h3>🧩 Layered DI fixtures</h3>
+      <p>config → data → auth → page: tests declare what they need and receive it ready-made. No
+      setup boilerplate, no hidden globals, interfaces at every seam.</p>
+      <div class="where">fixtures/ (4 layers)</div></div>
+    <div class="card glass reveal"><h3>📄 POM + widget components</h3>
+      <p>33 page classes (Login, Home, Dashboard, Agenda, Calendar + 11 Surgery tabs + 5 Patient tabs + 4 Admin + 3 General-Admin) compose 13 component wrappers (PrimeNG table, autocomplete chooser, modal, confirmation, tabs, batch-save overlay, toast, date picker, file upload, toolbar, navbar, quick-finder). Each handled correctly once, reused everywhere.</p>
+      <div class="where">pages/ · page-components/</div></div>
+    <div class="card glass reveal"><h3>🗄 Module datasets</h3>
+      <p><code class="inline">getDataset('LoginTest', 2).UserID</code> — SQL rows → per-sandbox, per-environment JSON snapshots, plus output write-back for chained modules.</p>
+      <div class="where">database/module-data/</div></div>
+    <div class="card glass reveal"><h3>🔐 Secure credential backend</h3>
+      <p>Secrets never sit in JSON or env vars — the <code class="inline">users</code> table in SQLite is the single source of truth, consumed through the <code class="inline">IUserSource</code> interface.</p>
+      <div class="where">database/user-sources/</div></div>
+    <div class="card glass reveal"><h3>🕓 ET timezone everywhere</h3>
+      <p>Node process and every browser context pinned to America/New_York (DST-aware). Generated
+      surgery dates and app-rendered dates can never disagree — proven from an IST machine.</p>
+      <div class="where">config/timezone.ts</div></div>
+    <div class="card glass reveal"><h3>🛡 Flake mitigation system</h3>
+      <p>Web-first assertions, component-owned waits, retry/safe-click/safe-fill, DOM-stability
+      detection for PrimeNG re-renders — and lint rules that block sleeps and test conditionals.</p>
+      <div class="where">utilities/stability.helper.ts</div></div>
+    <div class="card glass reveal"><h3>🖥 No-browser validation harnesses</h3>
+      <p>The entire data/config layer (57 checks × 5 sandboxes) and the runner plan verify from the
+      console in seconds — demoable in a meeting room, CI-gateable before any browser starts.</p>
+      <div class="where">validate:data · validate:runner</div></div>
+    <div class="card glass reveal"><h3>📊 Six-channel reporting</h3>
+      <p>HTML, Allure, summary.json, per-run action log, Slack digest, ELK analytics — one run feeds
+      every audience from debugging engineer to leadership.</p>
+      <div class="where">reporters/</div></div>
+    <div class="card glass reveal"><h3>📐 SOLID + generated docs</h3>
+      <p>Principle-by-principle compliance mapping, JSDoc with examples on every class, 284 generated
+      API pages, a tester's worked guide, and a refactor log with rationale for every change.</p>
+      <div class="where">docs/ · npm run docs:api</div></div>
+  </div>
+
+  <h2 class="sec reveal" id="compare">Feature Comparison</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Capability</th><th>Vanilla Playwright</th><th>This Framework</th></tr>
+      <tr><td>Run controlled without code changes</td><td>—</td><td class="ok">✓ SQLite-driven, identical plans proven</td></tr>
+      <tr><td>Multi-tenant matrix execution</td><td>manual scripting</td><td class="ok">✓ one command, 20 legs, auto-discovered</td></tr>
+      <tr><td>Concurrent multi-role sessions</td><td>manual contexts</td><td class="ok">✓ adminPage / surgeonPage fixtures</td></tr>
+      <tr><td>Dataset-by-S.No pattern</td><td>—</td><td class="ok">✓ env + sandbox scoped</td></tr>
+      <tr><td>Credentials outside code/JSON/env</td><td>—</td><td class="ok">✓ SQLite users table, IUserSource interface</td></tr>
+      <tr><td>Action-level audit log</td><td>trace viewer only</td><td class="ok">✓ automatic, zero instrumentation</td></tr>
+      <tr><td>Cross-engine coverage (Gecko/WebKit)</td><td class="ok">✓ manual</td><td class="ok">✓ tiered projects</td></tr>
+      <tr><td>Type safety &amp; refactorability</td><td class="ok">✓</td><td class="ok">✓ strict TS, 0 any, interfaces at seams</td></tr>
+      <tr><td>Offline verifiability</td><td>—</td><td class="ok">✓ 57-check console harness</td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal">Discipline, enforced by tooling</h2>
+  <div class="grid c3">
+    <div class="card glass reveal"><h3>Lint guardrails</h3><p>No <code class="inline">networkidle</code> in specs,
+      no conditionals in tests, every test must assert, no focused/paused tests.</p></div>
+    <div class="card glass reveal"><h3>Locator hierarchy</h3><p>testid → role → label → text → CSS,
+      enforced by review convention and documented in every page class.</p></div>
+    <div class="card glass reveal"><h3>Data uniqueness</h3><p>Builders embed timestamps/randomness so
+      parallel workers never collide on patients, MRNs or emails.</p></div>
+  </div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="roadmap.html">Next: Roadmap →</a></div>
+  </footer>
+</main>
+</body>
+</html>

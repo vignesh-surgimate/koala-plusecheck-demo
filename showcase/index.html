@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Home">
+<title>Surgimate Automation Framework — Enterprise Documentation Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <section class="hero reveal">
+    <div class="eyebrow">Enterprise Test Automation · Healthcare SaaS</div>
+    <h1>One framework. Every sandbox, every role,<br>every browser — externally controlled.</h1>
+    <p>A Playwright + TypeScript platform purpose-built for the Surgimate surgery-coordination
+    product: multi-tenant by design, data-driven from SQLite to canonical JSON, SOLID-compliant,
+    fully documented, and verifiable end-to-end without touching a browser.</p>
+    <div class="cta">
+      <a class="btn light" href="framework-features.html">Explore Features</a>
+      <a class="btn ghost" href="architecture.html">View Architecture</a>
+      <a class="btn ghost" href="reporting-dashboard.html">Reporting &amp; Analytics</a>
+    </div>
+  </section>
+
+  <h2 class="sec reveal" id="kpis">Key Performance Indicators</h2>
+  <p class="lead reveal">Live figures from the framework's own verification gates — not estimates.</p>
+  <div class="kpis">
+    <div class="kpi glass reveal"><div class="n" data-count="5">0</div><div class="l">Supported Browsers</div><div class="s">Chrome · Edge · Chromium · Firefox · WebKit</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="7">0</div><div class="l">Supported Viewports</div><div class="s">desktop · tablet · hybrid devices</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="75" data-suffix="+">0</div><div class="l">Framework Components</div><div class="s">documented classes &amp; modules</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="150" data-suffix="ms">0</div><div class="l">Test Execution Speed</div><div class="s">avg data-layer test (measured)</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="16" data-suffix="×">0</div><div class="l">Parallel Capacity</div><div class="s">4 CI workers × 4 shards</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="15">0</div><div class="l">Environment Coverage</div><div class="s">3 environments × 5 sandboxes</div></div>
+  </div>
+
+  <h2 class="sec reveal">Executive Summary</h2>
+  <div class="grid c2">
+    <div class="card glass reveal">
+      <h3>🎛 The run is data, not code</h3>
+      <p>The <b>Runner Manager</b> lets QA leadership decide which tests run, in what priority,
+      with what description and how many data iterations — by editing the SQLite
+      <code class="inline">runmanager</code> table. No commits, no code review, no engineering bottleneck.</p>
+      <div class="where">data-driven-testing.html → Runner Manager</div>
+    </div>
+    <div class="card glass reveal">
+      <h3>🏥 Release confidence across every customer</h3>
+      <p>Five EMR sandboxes (ModMed, Athena, Veradigm, ROI, eCW) × four clinical roles run as a
+      single 20-leg matrix from one command, with per-leg pass/fail reporting. Tenant-specific
+      regressions surface before customers ever see them.</p>
+      <div class="where">cicd-pipeline.html → Tenant Matrix</div>
+    </div>
+    <div class="card glass reveal">
+      <h3>🛡 Trustworthy signal, audited evidence</h3>
+      <p>Component-owned waits for the app's flakiest widgets, lint-enforced test discipline, and
+      six reporting channels — including a per-run <b>action log</b> capturing every click, fill,
+      and assertion with Eastern-Time timestamps. Healthcare-compliance friendly.</p>
+      <div class="where">reporting-dashboard.html</div>
+    </div>
+    <div class="card glass reveal">
+      <h3>📐 Engineered to stay cheap to own</h3>
+      <p>SOLID-verified structure, single-owner locators, zero <code class="inline">any</code>
+      types, zero TypeScript/lint errors, deduplicated logic, and 284 generated API-doc pages.
+      A new tester ships their first test in hours using the worked guide.</p>
+      <div class="where">architecture.html → SOLID</div>
+    </div>
+  </div>
+
+  <h2 class="sec reveal" id="quality">Verified Quality Gates</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Gate</th><th>Result</th><th>How it's proven</th></tr>
+      <tr><td>TypeScript strict compile</td><td class="ok">0 errors</td><td><code class="inline">npm run build</code> — was 25+ before the SOLID refactor</td></tr>
+      <tr><td>ESLint + Playwright rules</td><td class="ok">0 errors</td><td>No sleeps, no test conditionals, every test asserts</td></tr>
+      <tr><td>Data layer — all 5 sandboxes</td><td class="ok">57 / 57 checks</td><td><code class="inline">npm run validate:data</code> — runs with <b>no browser</b></td></tr>
+      <tr><td>Runner Manager contract</td><td class="ok">PASS</td><td>SQLite → canonical JSON → proven execution plan</td></tr>
+      <tr><td>Tenant matrix discovery</td><td class="ok">20 combinations</td><td>Driven entirely by the credentials backend</td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal" id="stack">Technology Stack</h2>
+  <div class="stack">
+    <div class="tile glass reveal"><img src="assets/icons/playwright.svg" alt="Playwright"><h4>Playwright 1.48</h4><p>engine &amp; runner</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/typescript.svg" alt="TypeScript"><h4>TypeScript</h4><p>strict, zero any</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/sqlite.svg" alt="SQLite"><h4>SQL / SQLite</h4><p>data &amp; credentials</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/docker.svg" alt="Docker"><h4>Docker</h4><p>containerized runs</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/chrome.svg" alt="Chrome"><h4>Chrome</h4><p>primary target</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/edge.svg" alt="Edge"><h4>Edge</h4><p>msedge channel</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/firefox.svg" alt="Firefox"><h4>Firefox</h4><p>Gecko engine</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/safari.svg" alt="Safari"><h4>Safari</h4><p>WebKit engine</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/git.svg" alt="Git"><h4>Git</h4><p>version control</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/github.svg" alt="GitHub"><h4>GitHub Actions</h4><p>CI workflows</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/jenkins.svg" alt="Jenkins"><h4>Jenkins</h4><p>compatible</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/restapi.svg" alt="REST API"><h4>REST API</h4><p>data setup layer</p></div>
+    <div class="tile glass reveal"><img src="assets/icons/allure.svg" alt="Allure"><h4>Allure + ELK</h4><p>reporting stack</p></div>
+  </div>
+
+  <h2 class="sec reveal">Start Here</h2>
+  <div class="grid c3">
+    <a class="card glass reveal" href="architecture.html" style="color:var(--text)"><h3>🏗 Architecture</h3><p>Layered fixtures, POM + components, SOLID mapping, interactive layer explorer.</p></a>
+    <a class="card glass reveal" href="data-driven-testing.html" style="color:var(--text)"><h3>🗄 Data-Driven Testing</h3><p>Runner Manager, SQL → JSON conversion, module datasets, credential backends.</p></a>
+    <a class="card glass reveal" href="reporting-dashboard.html" style="color:var(--text)"><h3>📊 Reporting &amp; Analytics</h3><p>Six channels — HTML, Allure, action log, summary, Slack, ELK dashboards.</p></a>
+  </div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+  </footer>
+</main>
+</body>
+</html>

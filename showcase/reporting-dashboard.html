@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Reporting &amp; Analytics">
+<title>Reporting &amp; Analytics — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/allure.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Operations</div>
+    <h1>Reporting &amp; Analytics Dashboards</h1>
+    <p>Six complementary channels run from the same execution — each answers a different question
+    for a different audience, from a debugging engineer to leadership reading trends.</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi glass reveal"><div class="n" data-count="8">0</div><div class="l">Report Channels</div><div class="s">one run feeds all</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="100" data-suffix="%">0</div><div class="l">Action Capture</div><div class="s">every click/fill/assert logged</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="20">0</div><div class="l">Legs / One Allure</div><div class="s">matrix merges into one report</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="3">0</div><div class="l">Failure Artifacts</div><div class="s">screenshot · video · trace</div></div>
+  </div>
+
+  <h2 class="sec reveal">Channel Matrix</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Channel</th><th>Audience — question answered</th><th>Activation</th></tr>
+      <tr><td>Playwright HTML</td><td>Engineers — “why did this fail?” Steps, failure screenshots, videos, full traces on retry</td><td>always</td></tr>
+      <tr><td>Allure</td><td>QA leads &amp; managers — run health, suites, retries, env panel (ENV/ROLE/SANDBOX)</td><td>always (local + CI)</td></tr>
+      <tr><td>summary.json</td><td>Dashboards — totals incl. <b>flaky</b> (passed-on-retry), duration, context, timestamp</td><td>always</td></tr>
+      <tr><td>Action Log</td><td>Auditors — complete per-run action trail with ET timestamps</td><td>always</td></tr>
+      <tr><td>Slack digest</td><td>Team channel — “did the nightly break?” Top-10 failures + CI deep link</td><td>SLACK_WEBHOOK_URL</td></tr>
+      <tr><td>Elasticsearch / Kibana</td><td>Leadership — pass-rate by tenant/browser/role, flaky leaderboard, duration trends</td><td>ELASTICSEARCH_URL</td></tr>
+      <tr><td>JSON results</td><td>CI systems — machine-readable feed for dashboards and integrations</td><td>CI only · <code class="inline">test-results/results.json</code></td></tr>
+      <tr><td>Console (dot / list)</td><td>Developer terminal — real-time dots in CI, verbose list locally</td><td>always</td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal" id="actionlog">Action Log — every action, zero instrumentation</h2>
+  <p class="lead reveal">A custom reporter persists every Playwright API call, assertion and test step
+  to <code class="inline">logs/run-&lt;ET-timestamp&gt;.log</code>. Page objects and specs need no logging
+  code — the runner emits each action as a step and the reporter captures it. Real output:</p>
+  <pre class="reveal">[04:38:12.806] RUN START | env=staging | sandbox=ModMedSandbox | role=Coordinator | tests=5 | tz=America/New_York
+[04:38:13.262] TEST   ▶ module-dataset.spec.ts › reads a LoginTest dataset by module + S.No
+[04:38:13.297]   <span class="cmd">ASSERT</span> Expect "toBeGreaterThan" (0ms)
+[04:38:13.300]   <span class="cmd">ASSERT</span> Expect "toContain" (1ms)
+[04:38:13.307] TEST   ✓ PASSED — reads a LoginTest dataset by module + S.No (17ms)
+[04:38:13.405] RUN END | status=passed | duration=678ms
+<span class="cmt">UI runs additionally log:  ACTION page.goto(…)  ·  ACTION locator.click(…)  ·  STEP Navigate to dashboard</span></pre>
+
+  <h2 class="sec reveal" id="elk">Analytics Pipeline (ELK)</h2>
+  <div class="flow reveal">
+    <div class="step glass"><div class="k">emit</div><h4>1 doc / test</h4><p>status, duration, env, browser, role, sandbox, tags, retries, commit</p></div>
+    <div class="step glass"><div class="k">index</div><h4>Elasticsearch</h4><p>bulk-indexed at run end, monthly indices</p></div>
+    <div class="step glass"><div class="k">visualize</div><h4>Kibana</h4><p>pass-rate by tenant · flaky leaderboard · duration trends</p></div>
+    <div class="step glass"><div class="k">decide</div><h4>Leadership view</h4><p>where flake lives, what slowed down, since which build</p></div>
+  </div>
+
+  <h2 class="sec reveal">The Allure Workflow</h2>
+  <pre class="reveal"><span class="cmd">npm run allure:clean</span>          <span class="cmt"># fresh slate</span>
+<span class="cmd">npm run test:matrix:smoke</span>     <span class="cmt"># all 20 legs append to the same allure-results</span>
+<span class="cmd">npm run report:allure</span>         <span class="cmt"># ONE consolidated report across the whole customer base</span>
+<span class="cmd">npm run allure:serve</span>          <span class="cmt"># one-shot temp report</span></pre>
+
+  <div class="note reveal"><b>Operational note:</b> passing <code class="inline">--reporter=…</code> on the
+  CLI overrides the configured reporters — summary.json, Allure and the action log only appear on
+  runs without that flag.</div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="framework-features.html">Next: Framework Features →</a></div>
+  </footer>
+</main>
+</body>
+</html>

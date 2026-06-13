@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Browser Matrix">
+<title>Browser Matrix — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Coverage</div>
+    <h1>Browser Support Dashboard</h1>
+    <p>Three rendering engines, five browsers, scoped by risk: Chromium carries the full regression,
+    Edge guards the enterprise channel, Firefox and WebKit validate cross-engine behavior.</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi glass reveal"><div class="n" data-count="3">0</div><div class="l">Rendering Engines</div><div class="s">Chromium · Gecko · WebKit</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="5">0</div><div class="l">Browsers</div><div class="s">incl. branded channels</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="15">0</div><div class="l">Playwright Projects</div><div class="s">auth-setup + runner-managed + 13 test projects</div></div>
+    </div>
+
+  <h2 class="sec reveal">Engine Coverage</h2>
+  <div class="grid c4">
+    <div class="card glass reveal" style="text-align:center"><img src="assets/icons/chrome.svg" alt="Chrome" style="width:54px"><h3 style="justify-content:center;margin-top:10px">Chrome</h3><p>Chromium · primary target<br><span class="pill green">smoke + regression</span></p></div>
+    <div class="card glass reveal" style="text-align:center"><img src="assets/icons/edge.svg" alt="Edge" style="width:54px"><h3 style="justify-content:center;margin-top:10px">Edge</h3><p>Chromium · msedge channel<br><span class="pill">smoke tier</span></p></div>
+    <div class="card glass reveal" style="text-align:center"><img src="assets/icons/firefox.svg" alt="Firefox" style="width:54px"><h3 style="justify-content:center;margin-top:10px">Firefox</h3><p>Gecko engine<br><span class="pill">regression tier</span></p></div>
+    <div class="card glass reveal" style="text-align:center"><img src="assets/icons/safari.svg" alt="Safari" style="width:54px"><h3 style="justify-content:center;margin-top:10px">Safari</h3><p>WebKit engine (any OS)<br><span class="pill">regression tier</span></p></div>
+  </div>
+
+  <h2 class="sec reveal" id="projects">All 15 Playwright Projects</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>#</th><th>Project</th><th>Engine / Channel</th><th>Viewport</th><th>Scope</th><th>Environment</th></tr>
+      <tr><td>1</td><td>auth-setup</td><td>Chrome</td><td>—</td><td><span class="pill">produces storageState files</span></td><td>all</td></tr>
+      <tr><td>2</td><td>staging-chrome-runner-managed</td><td>Chromium</td><td>1366 × 768</td><td><span class="pill">sequential · priority order</span></td><td>staging</td></tr>
+      <tr><td>3</td><td>staging-chrome</td><td>Chromium (Desktop Chrome)</td><td>1366 × 768</td><td><span class="pill green">all tests · primary</span></td><td>staging</td></tr>
+      <tr><td>4</td><td>staging-desktop-large</td><td>Chromium</td><td>1920 × 1080</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>5</td><td>staging-surface-pro</td><td>Chromium (touch)</td><td>1440 × 960</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>6</td><td>staging-ipad-landscape</td><td>WebKit / Safari</td><td>1366 × 1024</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>7</td><td>staging-galaxy-tab</td><td>Chromium (touch)</td><td>1280 × 800</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>8</td><td>staging-surface-laptop</td><td>Chromium</td><td>1280 × 853</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>9</td><td>staging-ipad-small</td><td>WebKit / Safari</td><td>1194 × 834</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>10</td><td>staging-chrome-mobile</td><td>Chromium (Pixel 5)</td><td>375 × 812</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>11</td><td>staging-firefox</td><td>Gecko (Desktop Firefox)</td><td>device default</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>12</td><td>staging-webkit</td><td>WebKit (Desktop Safari)</td><td>device default</td><td><span class="pill">@regression</span></td><td>staging</td></tr>
+      <tr><td>13</td><td>staging-edge</td><td>Chromium · <code class="inline">msedge</code></td><td>1366 × 768</td><td><span class="pill">@smoke</span></td><td>staging</td></tr>
+      <tr><td>14</td><td>preprod-chrome</td><td>Chromium</td><td>1366 × 768</td><td><span class="pill green">all tests</span></td><td>pre-production</td></tr>
+      <tr><td>15</td><td>production-chrome</td><td>Chromium</td><td>1366 × 768</td><td><span class="pill amber">@smoke only</span></td><td>production</td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal">How browsers are wired — real config</h2>
+  <pre class="reveal"><span class="cmt">// playwright.config.ts — shared options come from one base (config/playwright-base.ts)</span>
+<span class="kw">const</span> <span class="fn">forEnv</span> = (envName: <span class="typ">string</span>) =&gt; ({
+  storageState: <span class="fn">storageStatePath</span>(role, client, envName),
+  baseURL: <span class="fn">getEnvironmentConfig</span>(envName).baseUrl,
+});
+
+{
+  name: <span class="str">'staging-edge'</span>,
+  dependencies: [<span class="str">'auth-setup'</span>],
+  use: { ...devices[<span class="str">'Desktop Edge'</span>], viewport: { width: <span class="num">1366</span>, height: <span class="num">768</span> }, ...<span class="fn">forEnv</span>(<span class="str">'staging'</span>) },
+  grep: <span class="str">/@smoke/</span>,
+},</pre>
+
+  <h2 class="sec reveal">Run Commands</h2>
+  <pre class="reveal"><span class="cmd">npx playwright test --project=staging-chrome</span>     <span class="cmt"># primary full run</span>
+<span class="cmd">npx playwright test --project=staging-edge</span>       <span class="cmt"># enterprise channel smoke</span>
+<span class="cmd">npx playwright test --project=staging-firefox --project=staging-webkit</span>  <span class="cmt"># cross-engine</span>
+<span class="cmd">npm run test:matrix:smoke</span>                        <span class="cmt"># × 20 sandbox/role legs</span></pre>
+
+  <div class="note violet reveal"><b>Why this split:</b> the application officially targets desktop
+  Chromium-class browsers; Firefox/WebKit run the regression tier to catch engine-specific CSS,
+  focus and date-input differences early, while Edge smoke protects the channel most hospital IT
+  departments standardize on.</div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="viewport-strategy.html">Next: Viewport Strategy →</a></div>
+  </footer>
+</main>
+</body>
+</html>

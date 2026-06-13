@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="CI/CD Pipeline">
+<title>CI/CD Pipeline — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/github.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Operations</div>
+    <h1>CI/CD Integration Workflows <span class="pill amber" style="font-size:0.6em;vertical-align:middle;margin-left:10px">⏳ In Progress</span></h1>
+    <p>Two GitHub Actions workflows ship with the framework; the same npm scripts and env-var
+    contract drop into Jenkins unchanged — the pipeline is just a thin shell around
+    <code class="inline">npm run …</code>.</p>
+    <div class="note violet reveal" style="margin-top:16px"><b>⏳ In Progress:</b> Allure publishing target, Slack/ELK secrets wiring, and scheduled matrix runs are actively being configured and validated.</div>
+  </div>
+
+  <h2 class="sec reveal">Pull Request → Smoke Gate</h2>
+  <div class="flow reveal">
+    <div class="step glass"><div class="k">trigger</div><h4>PR opened</h4><p>main / develop branches</p></div>
+    <div class="step glass"><div class="k">gate 1</div><h4>Static checks</h4><p>tsc 0 errors · eslint 0 errors</p></div>
+    <div class="step glass"><div class="k">gate 2</div><h4>No-browser proof</h4><p>validate:data 57/57 · validate:runner</p></div>
+    <div class="step glass"><div class="k">gate 3</div><h4>@smoke run</h4><p>staging-chrome + staging-edge</p></div>
+    <div class="step glass"><div class="k">result</div><h4>PR status + artifacts</h4><p>HTML report, traces, action log</p></div>
+  </div>
+
+  <h2 class="sec reveal" id="matrix">Nightly → Full Regression Matrix</h2>
+  <div class="diagram glass reveal">
+    <svg viewBox="0 0 1040 320" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="ar5" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+        <path d="M0,0 L8,4.5 L0,9 z" fill="#A855F7"/></marker></defs>
+      <rect x="20" y="120" width="160" height="80" rx="12" class="dg-solid"/>
+      <text x="100" y="152" text-anchor="middle" class="dg-tw">Nightly cron</text>
+      <text x="100" y="176" text-anchor="middle" fill="#DDD6FE" font-size="12">+ manual dispatch</text>
+      <rect x="240" y="120" width="190" height="80" rx="12" class="dg-box"/>
+      <text x="335" y="148" text-anchor="middle" class="dg-th">Tenant matrix</text>
+      <text x="335" y="170" text-anchor="middle" class="dg-tm">discovered from credentials</text>
+      <text x="335" y="188" text-anchor="middle" class="dg-tm">5 sandboxes × 4 roles</text>
+      <g>
+        <rect x="490" y="28" width="150" height="56" rx="10" class="dg-tint"/><text x="565" y="62" text-anchor="middle" class="dg-t">shard 1/4</text>
+        <rect x="490" y="100" width="150" height="56" rx="10" class="dg-tint"/><text x="565" y="134" text-anchor="middle" class="dg-t">shard 2/4</text>
+        <rect x="490" y="172" width="150" height="56" rx="10" class="dg-tint"/><text x="565" y="206" text-anchor="middle" class="dg-t">shard 3/4</text>
+        <rect x="490" y="244" width="150" height="56" rx="10" class="dg-tint"/><text x="565" y="278" text-anchor="middle" class="dg-t">shard 4/4</text>
+      </g>
+      <rect x="700" y="84" width="180" height="72" rx="12" class="dg-box"/>
+      <text x="790" y="112" text-anchor="middle" class="dg-th">Re-run failed only</text>
+      <text x="790" y="134" text-anchor="middle" class="dg-tm">--last-failed safety net</text>
+      <rect x="700" y="180" width="180" height="90" rx="12" class="dg-box"/>
+      <text x="790" y="208" text-anchor="middle" class="dg-th">Aggregate</text>
+      <text x="790" y="230" text-anchor="middle" class="dg-tm">allure-results merge</text>
+      <text x="790" y="248" text-anchor="middle" class="dg-tm">summary.json per leg</text>
+      <rect x="920" y="84" width="100" height="186" rx="12" class="dg-solid"/>
+      <text x="970" y="120" text-anchor="middle" class="dg-tw" font-size="12.5">Publish</text>
+      <text x="970" y="146" text-anchor="middle" fill="#DDD6FE" font-size="11.5">Allure →</text>
+      <text x="970" y="162" text-anchor="middle" fill="#DDD6FE" font-size="11.5">Pages</text>
+      <text x="970" y="190" text-anchor="middle" fill="#DDD6FE" font-size="11.5">Slack digest</text>
+      <text x="970" y="218" text-anchor="middle" fill="#DDD6FE" font-size="11.5">ELK index</text>
+      <text x="970" y="246" text-anchor="middle" fill="#DDD6FE" font-size="11.5">artifacts</text>
+      <line x1="180" y1="160" x2="236" y2="160" class="dg-line" marker-end="url(#ar5)"/>
+      <line x1="430" y1="140" x2="486" y2="62" class="dg-line" marker-end="url(#ar5)"/>
+      <line x1="430" y1="152" x2="486" y2="128" class="dg-line" marker-end="url(#ar5)"/>
+      <line x1="430" y1="168" x2="486" y2="196" class="dg-line" marker-end="url(#ar5)"/>
+      <line x1="430" y1="180" x2="486" y2="268" class="dg-line" marker-end="url(#ar5)"/>
+      <line x1="640" y1="120" x2="696" y2="120" class="dg-line" marker-end="url(#ar5)"/>
+      <line x1="640" y1="216" x2="696" y2="216" class="dg-line" marker-end="url(#ar5)"/>
+      <line x1="880" y1="180" x2="916" y2="180" class="dg-line" marker-end="url(#ar5)"/>
+    </svg>
+  </div>
+  <pre class="reveal"><span class="cmt"># the matrix is one command — per-leg PASS/FAIL summary, non-zero exit on any failure</span>
+<span class="cmd">npm run test:matrix -- --grep @regression</span>
+<span class="cmd">npm run test:matrix -- --client=ZTESTATHENA --role=Coordinator</span>   <span class="cmt"># targeted slice</span></pre>
+
+  <h2 class="sec reveal" id="others">Drop-in CI Compatibility</h2>
+  <div class="grid c3">
+    <div class="card glass reveal"><h3><img src="assets/icons/github.svg" alt="">GitHub Actions</h3>
+      <p>Ships in-repo: <code class="inline">smoke.yml</code> on PRs, <code class="inline">regression.yml</code>
+      nightly with sharding and Allure publishing. <code class="inline">CI=true</code> auto-tunes
+      retries (2) and workers (4).</p></div>
+    <div class="card glass reveal"><h3><img src="assets/icons/jenkins.svg" alt="">Jenkins</h3>
+      <p>Drop-in compatible: a declarative stage calling
+      <code class="inline">npm run test:matrix</code> with env credentials binding — same npm script contract, no framework changes needed.</p></div>
+    </div>
+
+  <h2 class="sec reveal">CI Behavior Switches</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Variable</th><th>Effect in CI</th></tr>
+      <tr><td>CI=true</td><td>retries 2 · workers 4 · dot/json/html/summary/action-log/ELK/Slack/Allure reporters · forbidOnly</td></tr>
+      <tr><td>PLAYWRIGHT_ENV / CLIENT / ROLE</td><td>environment × sandbox × role for the leg</td></tr>
+      <tr><td>DATASOURCE / USER_SOURCE</td><td>runner-list source · credential backend (db default)</td></tr>
+      <tr><td>ELASTICSEARCH_URL / SLACK_WEBHOOK_URL</td><td>activate telemetry indexing / failure digest (silent when unset)</td></tr>
+    </table>
+  </div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="reporting-dashboard.html">Next: Reporting &amp; Analytics →</a></div>
+  </footer>
+</main>
+</body>
+</html>

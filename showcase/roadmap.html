@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Roadmap &amp; Business Value">
+<title>Roadmap &amp; Business Value — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Overview</div>
+    <h1>Roadmap &amp; Business Value</h1>
+    <p>Where the platform stands today, what's next, and why it matters in business terms.</p>
+  </div>
+
+  <h2 class="sec reveal" id="value">Business Value</h2>
+  <div class="grid c2">
+    <div class="card glass reveal"><h3>📉 Lower cost of ownership</h3>
+      <p>Single-owner locators, SOLID structure and two documented dedup passes mean every fix lands
+      in exactly one place. Zero TypeScript/lint errors and 284 generated doc pages keep the
+      maintenance bus-factor high and onboarding to <b>hours, not weeks</b>.</p></div>
+    <div class="card glass reveal"><h3>🚀 Faster release cycles</h3>
+      <p>16× parallel capacity (workers × shards), a 5-minute smoke gate per PR, and no-browser
+      console gates that fail fast before a single browser launches. The nightly covers the entire
+      customer base — 20 tenant/role legs — unattended.</p></div>
+    <div class="card glass reveal"><h3>🧭 Leadership control without engineering</h3>
+      <p>The Runner Manager hands run scope, priority and data volume to QA leadership via SQLite. Re-prioritizing tonight's regression is a table edit — no commit, no review, no wait.</p></div>
+    <div class="card glass reveal"><h3>🏥 Compliance-grade evidence</h3>
+      <p>Per-run action logs with ET timestamps, screenshots/videos/traces on failure, env-stamped
+      Allure history and ELK trends — the audit trail healthcare conversations expect, produced
+      automatically.</p></div>
+  </div>
+
+  <h2 class="sec reveal">Current Status</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Item</th><th>Status</th></tr>
+      <tr><td>Core framework (fixtures · POM · runner · data layer · reporting)</td><td class="ok">Complete — all gates green</td></tr>
+      <tr><td>All 5 tenants — ModMedSandbox, ZTESTATHENA, Veradigm Demo, ROI, eCW</td><td class="ok">✅ Complete — credentials configured; all 5 sandboxes join the matrix automatically</td></tr>
+      <tr><td>Staging availability</td><td class="warn">Backend outage observed during last live validation — UI E2E re-run pending; framework verified to the app boundary</td></tr>
+      <tr><td>Docker compose stack (runner + Allure + ELK)</td><td class="warn">⏳ In Progress — Dockerfile defined (playwright:v1.48.0-noble); docker-compose services being validated</td></tr>
+      <tr><td>CI workflows (smoke + regression)</td><td class="warn">⏳ In Progress — workflows in repo; Allure publishing target and secrets wiring in progress</td></tr>
+      <tr><td>Kibana / ELK analytics dashboards</td><td class="warn">⏳ In Progress — elk-reporter built and tested; Elasticsearch index + Kibana dashboard setup in progress</td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal">Next Steps</h2>
+  <div class="flow reveal">
+    <div class="step glass"><div class="k">Q3 · 1</div><h4>Real tenant credentials</h4><p>Replace the 3 placeholder sandboxes in the users table; matrix instantly covers all 5.</p></div>
+    <div class="step glass"><div class="k">Q3 · 2</div><h4>Staging E2E re-run</h4><p>Execute the full smoke + viewport sweep when the environment recovers.</p></div>
+    <div class="step glass"><div class="k">Q3 · 3</div><h4>CI hardening</h4><p>Allure-to-Pages publishing, Slack/ELK secrets, scheduled matrix.</p></div>
+    <div class="step glass"><div class="k">Q4</div><h4>Coverage growth</h4><p>Activate specs for the remaining 25+ documented page objects (surgery tabs, admin).</p></div>
+  </div>
+  <div class="grid c3">
+    <div class="card glass reveal"><h3>data-testid adoption</h3><p>Recommended dev-team investment: stable test ids in the Angular app harden the locator hierarchy further.</p></div>
+    <div class="card glass reveal"><h3>Vault-backed credentials</h3><p>The IUserSource seam makes a secrets-manager backend a one-class addition when security policy requires it.</p></div>
+    <div class="card glass reveal"><h3>MySQL runner source</h3><p>One <code class="inline">IRunnerDataSource</code> implementation — nothing downstream changes.</p></div>
+  </div>
+
+  <h2 class="sec reveal" id="todo">🚧 To-Do / R&amp;D / In Progress</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>#</th><th>Initiative</th><th>Status</th></tr>
+      <tr><td>1</td><td>Evaluate cloud execution strategy — GitHub Actions CI/CD vs Azure DevOps CI/CD for framework deployment and execution</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>2</td><td>Design and implement ELK (Elasticsearch, Logstash, Kibana) Dashboard for centralized test execution monitoring and reporting</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>3</td><td>Research and implement a robust approach for handling Multi-Factor Authentication (MFA) in automated test execution</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>4</td><td>Optimize regression execution — configure parallel execution across multiple browsers and viewports to reduce overall execution time</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>5</td><td>Perform a deep-dive analysis of macOS execution support, including browser compatibility and test stability</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>6</td><td>Conduct framework scalability testing to validate performance with large test suites and concurrent executions</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>7</td><td>Develop a GitHub Pages Dashboard to publish automation reports, execution metrics, and framework health status</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>8</td><td>Research and implement Docker-based execution environments for consistent and portable test execution</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>9</td><td>Complete the CI/CD pipeline integration for automated test execution, reporting, and deployment workflows</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>10</td><td>Evaluate and integrate Slack notifications for real-time test execution updates and failure alerts</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>11</td><td>Analyze test execution trends and create historical reporting dashboards using Kibana</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>12</td><td>Investigate cross-platform execution support for Windows, macOS, and Linux environments</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>13</td><td>Explore cloud-based browser execution using platforms such as BrowserStack, Sauce Labs, or LambdaTest</td><td class="warn">🔬 R&amp;D</td></tr>
+      <tr><td>14</td><td>Define and implement a Regression Suite Management Strategy (Smoke, Sanity, Regression, and Release Validation Suites)</td><td class="warn">⏳ In Progress</td></tr>
+      <tr><td>15</td><td>Research automated test data management and environment provisioning strategies for scalable execution</td><td class="warn">🔬 R&amp;D</td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal" id="inprogress">🔄 Currently In Progress</h2>
+  <div class="grid c2">
+    <div class="card glass reveal"><h3>📊 ELK Dashboard</h3><p>Setup and integration of Elasticsearch + Kibana for centralized test execution monitoring.</p></div>
+    <div class="card glass reveal"><h3>📄 GitHub Pages Dashboard</h3><p>Development of a live dashboard publishing automation reports, metrics and framework health.</p></div>
+    <div class="card glass reveal"><h3>📈 Framework Scalability</h3><p>Assessing performance with large test suites and concurrent executions.</p></div>
+    <div class="card glass reveal"><h3>⚙️ CI/CD Pipeline</h3><p>Full pipeline implementation — automated execution, reporting and deployment workflows.</p></div>
+    <div class="card glass reveal"><h3>🔔 Slack Notifications</h3><p>Real-time test execution updates and failure alerts via Slack webhook integration.</p></div>
+    <div class="card glass reveal"><h3>🔐 MFA Automation</h3><p>Research and proof of concept for handling Multi-Factor Authentication in automated runs.</p></div>
+    <div class="card glass reveal"><h3>🌐 Cross-Browser Parallel Execution</h3><p>Optimizing parallel execution across multiple browsers and viewports to reduce total run time.</p></div>
+    <div class="card glass reveal"><h3>🍎 macOS Compatibility</h3><p>Validating browser compatibility and test stability on macOS execution environments.</p></div>
+  </div>
+
+  <h2 class="sec reveal">Scorecard</h2>
+  <div class="kpis">
+    <div class="kpi glass reveal"><div class="n" data-count="0">0</div><div class="l">TS + Lint Errors</div><div class="s">strict mode, zero any</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="57">0</div><div class="l">Offline Checks Pass</div><div class="s">all 5 sandboxes</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="284">0</div><div class="l">API Doc Pages</div><div class="s">generated from JSDoc</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="3">0</div><div class="l">Data Sources</div><div class="s">identical plans proven</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="20">0</div><div class="l">Matrix Legs</div><div class="s">5 sandboxes × 4 roles</div></div>
+  </div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="index.html">← Back to Home</a></div>
+  </footer>
+</main>
+</body>
+</html>

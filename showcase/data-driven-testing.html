@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Data-Driven Testing">
+<title>Data-Driven Testing — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Architecture · Flagship</div>
+    <h1>Data-Driven Testing</h1>
+    <p>Two pillars: the <b>Runner Manager</b> (external run control via SQLite → canonical JSON) and the <b>module-dataset pattern</b> — credentials backed by SQLite, never in JSON or env vars.</p>
+  </div>
+
+  <h2 class="sec reveal" id="runner">Runner Manager — the run is data, not code</h2>
+  <p class="lead reveal">Which tests run, in what priority, with what description, and how many data iterations — decided by one external record per test case in SQLite. QA leads reshape tonight's regression by editing the <code class="inline">runmanager</code> table; engineers commit nothing.</p>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Field</th><th>Meaning</th><th>Example effect</th></tr>
+      <tr><td>testcasename</td><td>Matches the suite key (case-insensitive)</td><td><code class="inline">TC_PatientSearch</code></td></tr>
+      <tr><td>execute</td><td>yes / no — include or drop</td><td>"no" → the test is <b>never registered</b> (invisible to the run)</td></tr>
+      <tr><td>testdescription</td><td>Injected into titles + report annotations</td><td>Readable Allure entries, zero code edits</td></tr>
+      <tr><td>priority</td><td>Execution order, ascending</td><td>Critical checks first (sequential runner project)</td></tr>
+      <tr><td>count</td><td>Max data iterations consumed</td><td>3 rows + count 2 → exactly <code class="inline">[1/2] [2/2]</code></td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal" id="schema">SQLite Database Schema (inputData.db)</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Table</th><th>Purpose</th><th>Key Columns</th></tr>
+      <tr><td><code class="inline">users</code></td><td>Credentials per role / sandbox / environment</td><td>Username, Password, Role, Sandbox, Environment</td></tr>
+      <tr><td><code class="inline">runmanager</code></td><td>Test execution control list</td><td>testcasename, execute, testdescription, priority, count</td></tr>
+      <tr><td><code class="inline">testdata</code></td><td>Runner-managed test data rows</td><td>testcasename, execute, groupname + data columns</td></tr>
+      <tr><td><code class="inline">logindata</code></td><td>Module-dataset login data</td><td>UserID, Password, Sandbox, Environment, Sno</td></tr>
+    </table>
+  </div>
+  <p class="lead reveal">DB is the single credential backend — credentials never sit in JSON, env vars, or code. The <code class="inline">IUserSource</code> interface seam makes a vault or MySQL backend a one-class addition.</p>
+
+  <h2 class="sec reveal" id="sqljson">SQL → JSON Canonical Conversion</h2>
+  <div class="diagram glass reveal">
+    <svg viewBox="0 0 1040 160" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+        <path d="M0,0 L8,4.5 L0,9 z" fill="#A855F7"/></marker></defs>
+      <rect x="20" y="40" width="220" height="80" rx="12" class="dg-tint"/>
+      <text x="130" y="72" text-anchor="middle" class="dg-th">SQLite (inputData.db)</text>
+      <text x="130" y="94" text-anchor="middle" class="dg-tm">runmanager · testdata tables</text>
+      <rect x="310" y="40" width="220" height="80" rx="12" class="dg-box"/>
+      <text x="420" y="72" text-anchor="middle" class="dg-th">global-setup.ts</text>
+      <text x="420" y="94" text-anchor="middle" class="dg-tm">ensureCanonicalData()</text>
+      <rect x="600" y="40" width="220" height="80" rx="12" class="dg-solid"/>
+      <text x="710" y="72" text-anchor="middle" class="dg-tw">Canonical JSON</text>
+      <text x="710" y="94" text-anchor="middle" fill="#DDD6FE" font-size="12">RUNMANAGER.json · &lt;ENV&gt;_TestData.json</text>
+      <rect x="890" y="40" width="130" height="80" rx="12" class="dg-box"/>
+      <text x="955" y="72" text-anchor="middle" class="dg-th">Runner</text>
+      <text x="955" y="94" text-anchor="middle" class="dg-tm">interception + data provider</text>
+      <line x1="240" y1="80" x2="306" y2="80" class="dg-line" marker-end="url(#ar3)"/>
+      <line x1="530" y1="80" x2="596" y2="80" class="dg-line" marker-end="url(#ar3)"/>
+      <line x1="820" y1="80" x2="886" y2="80" class="dg-line" marker-end="url(#ar3)"/>
+    </svg>
+  </div>
+  <p class="lead reveal">Every test run auto-regenerates canonical JSON from SQLite (default <code class="inline">DATASOURCE=db</code>). The runner always reads fresh JSON — no stale data, no manual sync.</p>
+
+  <h2 class="sec reveal" id="module">Module-Dataset Pattern</h2>
+  <p class="lead reveal">Dataset keyed by module name + sequence number, scoped by sandbox + environment, with per-env snapshots stored by sandbox name.</p>
+  <pre class="reveal"><span class="cmt">// SQLite module tables → snapshot data/moduledata/&lt;env&gt;/&lt;Sandbox&gt;_TestData.json</span>
+<span class="kw">const</span> login = moduleData.<span class="fn">getDataset</span>(<span class="str">'LoginTest'</span>, <span class="num">2</span>);  <span class="cmt">// "LoginTest_2".dataset</span>
+<span class="kw">await</span> loginPage.<span class="fn">login</span>(<span class="typ">String</span>(login.UserID), <span class="typ">String</span>(login.Password));
+
+<span class="cmt">// write-back (InsertOutputDatatoDb port) — outputs feed later modules</span>
+moduleData.<span class="fn">writeOutputData</span>(
+  <span class="str">'INSERT INTO outputdata (Sandbox, Environment, Module, OutputKey, OutputValue) VALUES (?,?,?,?,?)'</span>,
+  [testConfig.client, testConfig.environment, <span class="str">'AddPatientTest'</span>, <span class="str">'PatientID'</span>, createdId],
+);</pre>
+
+  <h2 class="sec reveal" id="credentials">Credential Backend — SQLite only</h2>
+  <div class="grid c2">
+    <div class="card glass reveal"><h3><img src="assets/icons/sqlite.svg" alt=""> SQLite <span class="pill green">single source of truth</span></h3>
+      <p><code class="inline">users</code> table in <code class="inline">testdata/database/inputData.db</code> — credentials per role, sandbox and environment. Permissionable, queryable, never in JSON or env vars.</p>
+      <div class="where">USER_SOURCE=db · IUserSource interface</div></div>
+    <div class="card glass reveal"><h3>🔒 Future-proof seam</h3>
+      <p>The <code class="inline">IUserSource</code> interface makes a vault or MySQL backend a one-class addition — nothing downstream changes.</p>
+      <div class="where">database/user-sources/</div></div>
+  </div>
+
+  <div class="note violet reveal"><b>Builders complete the picture:</b> repositories fetch <i>existing</i>
+  stored data; fluent builders (<code class="inline">new PatientBuilder().withFullDefaults().build()</code>)
+  generate <i>fresh, collision-proof</i> records safe for parallel workers — timestamps and randomized
+  identifiers guarantee uniqueness.</div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="browser-matrix.html">Next: Browser Matrix →</a></div>
+  </footer>
+</main>
+</body>
+</html>

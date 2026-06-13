@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Docker Architecture">
+<title>Docker Architecture — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/docker.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Operations</div>
+    <h1>Docker Execution Architecture</h1>
+    <p>The whole stack — test runner, Allure service, Elasticsearch and Kibana — runs as one
+    compose network. The execution image is built on Microsoft's official Playwright base, so
+    browsers, fonts and system dependencies are pinned and reproducible.</p>
+  </div>
+
+  <h2 class="sec reveal">Container Topology</h2>
+  <div class="diagram glass reveal">
+    <svg viewBox="0 0 1040 300" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="ar4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+        <path d="M0,0 L8,4.5 L0,9 z" fill="#A855F7"/></marker></defs>
+      <rect x="20" y="20" width="1000" height="260" rx="16" fill="rgba(109,40,217,.08)" stroke="#6D28D9" stroke-dasharray="8 6"/>
+      <text x="44" y="48" class="dg-th">docker network: automation</text>
+      <rect x="50" y="70" width="250" height="180" rx="12" class="dg-solid"/>
+      <text x="175" y="100" text-anchor="middle" class="dg-tw">playwright</text>
+      <text x="175" y="124" text-anchor="middle" fill="#DDD6FE" font-size="12">mcr.microsoft.com/playwright</text>
+      <text x="175" y="144" text-anchor="middle" fill="#DDD6FE" font-size="12">+ sqlite3 · framework code</text>
+      <text x="175" y="170" text-anchor="middle" fill="#DDD6FE" font-size="12">PLAYWRIGHT_ENV · CLIENT · ROLE</text>
+      <text x="175" y="196" text-anchor="middle" fill="#DDD6FE" font-size="12">volumes: test-results,</text>
+      <text x="175" y="214" text-anchor="middle" fill="#DDD6FE" font-size="12">allure-results, test-data</text>
+      <rect x="360" y="70" width="200" height="80" rx="12" class="dg-box"/>
+      <text x="460" y="100" text-anchor="middle" class="dg-th">allure</text>
+      <text x="460" y="122" text-anchor="middle" class="dg-tm">allure-docker-service :5050</text>
+      <text x="460" y="140" text-anchor="middle" class="dg-tm">live report, keeps history</text>
+      <rect x="360" y="170" width="200" height="80" rx="12" class="dg-box"/>
+      <text x="460" y="200" text-anchor="middle" class="dg-th">elasticsearch</text>
+      <text x="460" y="222" text-anchor="middle" class="dg-tm">single node :9200</text>
+      <text x="460" y="240" text-anchor="middle" class="dg-tm">result documents index</text>
+      <rect x="620" y="170" width="180" height="80" rx="12" class="dg-box"/>
+      <text x="710" y="200" text-anchor="middle" class="dg-th">kibana</text>
+      <text x="710" y="222" text-anchor="middle" class="dg-tm">:5601 dashboards</text>
+      <text x="710" y="240" text-anchor="middle" class="dg-tm">flaky leaderboard, trends</text>
+      <rect x="620" y="70" width="380" height="80" rx="12" class="dg-tint"/>
+      <text x="810" y="100" text-anchor="middle" class="dg-th">Surgimate target environment</text>
+      <text x="810" y="124" text-anchor="middle" class="dg-tm">staging / pre-production / production (HTTPS)</text>
+      <line x1="300" y1="110" x2="356" y2="110" class="dg-line" marker-end="url(#ar4)"/>
+      <line x1="300" y1="200" x2="356" y2="200" class="dg-line" marker-end="url(#ar4)"/>
+      <line x1="560" y1="210" x2="616" y2="210" class="dg-line" marker-end="url(#ar4)"/>
+      <line x1="560" y1="110" x2="616" y2="110" class="dg-line" marker-end="url(#ar4)"/>
+    </svg>
+  </div>
+
+  <h2 class="sec reveal">The Execution Image — real Dockerfile</h2>
+  <pre class="reveal"><span class="kw">FROM</span> mcr.microsoft.com/playwright:v1.48.0-noble
+
+<span class="kw">WORKDIR</span> /app
+<span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y sqlite3 &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+<span class="cmt"># dependency layer cached separately from source for fast rebuilds</span>
+<span class="kw">COPY</span> package.json package-lock.json ./
+<span class="kw">RUN</span> npm ci
+<span class="kw">COPY</span> . .
+
+<span class="kw">CMD</span> [<span class="str">"npx"</span>, <span class="str">"playwright"</span>, <span class="str">"test"</span>, <span class="str">"--project=staging-chrome"</span>, <span class="str">"--grep"</span>, <span class="str">"@smoke"</span>]</pre>
+
+  <h2 class="sec reveal" id="scaling">Scaling Model</h2>
+  <div class="grid c3">
+    <div class="card glass reveal"><h3>⚙ Workers (in-container)</h3>
+      <p>4 parallel workers per container in CI (auto-detected locally). Each worker owns an isolated
+      browser context — no shared state, no cross-talk.</p></div>
+    <div class="card glass reveal"><h3>🔀 Shards (across containers)</h3>
+      <p><code class="inline">--shard=1/4 … 4/4</code> splits the suite across machines or container
+      replicas. 4 workers × 4 shards = <b>16× parallel capacity</b> on the regression tier.</p></div>
+    <div class="card glass reveal"><h3>🏥 Matrix legs (across tenants)</h3>
+      <p>Each of the 20 sandbox × role legs is an independent container invocation — fan out the
+      whole customer base on a Kubernetes job queue or CI matrix.</p></div>
+  </div>
+
+  <h2 class="sec reveal">Operate It</h2>
+  <pre class="reveal"><span class="cmt"># build the execution image</span>
+<span class="cmd">docker build -f docker/Dockerfile -t surgimate-automation .</span>
+
+<span class="cmt"># full observability stack: runner + allure(:5050) + elasticsearch(:9200) + kibana(:5601)</span>
+<span class="cmd">docker compose -f docker/docker-compose.yml up</span>
+
+<span class="cmt"># one tenant leg, parameterized like any local run</span>
+<span class="cmd">docker run -e PLAYWRIGHT_CLIENT=eCW -e PLAYWRIGHT_ROLE=Surgeon surgimate-automation</span>
+
+<span class="cmt"># sharded fan-out (per CI machine / replica)</span>
+<span class="cmd">docker run surgimate-automation npx playwright test --grep @regression --shard=2/4</span></pre>
+
+  <div class="note violet reveal"><b>Why containers matter here:</b> identical browser binaries between a
+  tester's laptop and CI eliminates "works on my machine" flake triage; volumes persist
+  results/Allure history across runs; and the ELK pair turns every execution into queryable
+  telemetry without any external SaaS dependency.</div>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="cicd-pipeline.html">Next: CI/CD Pipeline →</a></div>
+  </footer>
+</main>
+</body>
+</html>

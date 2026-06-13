@@ -1,0 +1,15 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <radialGradient id="pw-grad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#45C046"/>
+      <stop offset="100%" stop-color="#1A7A1E"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="32" fill="url(#pw-grad)"/>
+  <circle cx="25" cy="26" r="11" fill="white" opacity="0.95"/>
+  <circle cx="39" cy="26" r="11" fill="white" opacity="0.70"/>
+  <circle cx="32" cy="40" r="9"  fill="white" opacity="0.85"/>
+  <circle cx="25" cy="26" r="5"  fill="#2EAD33"/>
+  <circle cx="39" cy="26" r="5"  fill="#1A7A1E"/>
+  <circle cx="32" cy="40" r="4"  fill="#2EAD33"/>
+</svg>

@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Viewport Strategy">
+<title>Viewport Strategy — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Coverage</div>
+    <h1>Viewport Coverage Dashboard</h1>
+    <p>Seven named device profiles plus Pixel 5 mobile — spanning clinical workstations, hybrid laptops, ward tablets and mobile — defined once in <code class="inline">config/browsers.ts</code> and consumed everywhere (the sweep derives from the same matrix, so adding a profile automatically joins it).</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi glass reveal"><div class="n" data-count="8">0</div><div class="l">Device Profiles</div><div class="s">single-source matrix</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="28">0</div><div class="l">Sweep Tests</div><div class="s">7 viewports × 4 roles</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="56">0</div><div class="l">Screenshots / Sweep</div><div class="s">login + dashboard each</div></div>
+    <div class="kpi glass reveal"><div class="n" data-count="1366">0</div><div class="l">Primary Width</div><div class="s">most common clinical display</div></div>
+  </div>
+
+  <h2 class="sec reveal">Visual Coverage Map</h2>
+  <div class="diagram glass reveal">
+    <svg viewBox="0 0 1040 470" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="20" width="691" height="389" rx="8" fill="rgba(139,92,246,.08)" stroke="#8B5CF6" stroke-width="1.6"/>
+      <text x="708" y="42" text-anchor="end" class="dg-th">1920 × 1080 — Desktop FHD</text>
+      <rect x="30" y="20" width="518" height="346" rx="8" fill="rgba(139,92,246,.08)" stroke="#A855F7" stroke-width="1.4"/>
+      <text x="535" y="352" text-anchor="end" class="dg-t">1440 × 960 — Surface Pro (touch)</text>
+      <rect x="30" y="20" width="492" height="369" rx="8" fill="none" stroke="#C4B5FD" stroke-width="1.3" stroke-dasharray="7 5"/>
+      <text x="510" y="383" text-anchor="end" class="dg-tm">1366 × 1024 — iPad Pro landscape</text>
+      <rect x="30" y="20" width="492" height="276" rx="8" fill="rgba(168,85,247,.10)" stroke="#A855F7" stroke-width="1.6"/>
+      <text x="509" y="282" text-anchor="end" class="dg-th">1366 × 768 — Primary clinical desktop</text>
+      <rect x="30" y="20" width="461" height="307" rx="8" fill="none" stroke="#8B5CF6" stroke-width="1.2"/>
+      <text x="478" y="320" text-anchor="end" class="dg-tm">1280 × 853 Surface Laptop · 1280 × 800 Galaxy Tab</text>
+      <rect x="30" y="20" width="430" height="300" rx="8" fill="none" stroke="#7C3AED" stroke-width="1.2" stroke-dasharray="3 4"/>
+      <text x="447" y="232" text-anchor="end" class="dg-tm">1194 × 834 — iPad small (DPR 2, touch)</text>
+      <line x1="387" y1="20" x2="387" y2="440" stroke="#FB7185" stroke-width="1.6" stroke-dasharray="8 6"/>
+      <text x="380" y="458" text-anchor="end" fill="#FB7185" font-size="12" font-family="Inter,Arial">&lt; 992px — officially unsupported (smoke-only check)</text>
+      <text x="740" y="120" class="dg-th" font-size="15">Support tiers</text>
+      <rect x="740" y="138" width="14" height="14" rx="4" fill="#A855F7"/><text x="762" y="150" class="dg-t">≥ 1366 — full regression</text>
+      <rect x="740" y="166" width="14" height="14" rx="4" fill="rgba(139,92,246,.45)"/><text x="762" y="178" class="dg-t">1200–1365 — layout-sensitive</text>
+      <rect x="740" y="194" width="14" height="14" rx="4" fill="rgba(139,92,246,.18)"/><text x="762" y="206" class="dg-t">992–1199 — modal/table checks</text>
+      <rect x="740" y="222" width="14" height="14" rx="4" fill="#FB7185"/><text x="762" y="234" class="dg-t">&lt; 992 — not supported</text>
+    </svg>
+  </div>
+
+  <h2 class="sec reveal" id="tiers">Profile Matrix</h2>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Profile</th><th>Resolution</th><th>DPR</th><th>Touch</th><th>Class</th></tr>
+      <tr><td>desktop-1920</td><td>1920 × 1080</td><td>1</td><td>—</td><td>Full desktop</td></tr>
+      <tr><td>desktop-1366 <span class="pill green">primary</span></td><td>1366 × 768</td><td>1</td><td>—</td><td>Clinical workstation</td></tr>
+      <tr><td>ipad-landscape</td><td>1366 × 1024</td><td>2</td><td>✓</td><td>Ward tablet</td></tr>
+      <tr><td>ipad-landscape-small</td><td>1194 × 834</td><td>2</td><td>✓</td><td>Compact tablet</td></tr>
+      <tr><td>samsung-galaxy-tab</td><td>1280 × 800</td><td>1.5</td><td>✓</td><td>Android tablet</td></tr>
+      <tr><td>surface-pro</td><td>1440 × 960</td><td>1</td><td>✓</td><td>Hybrid 2-in-1</td></tr>
+      <tr><td>surface-laptop</td><td>1280 × 853</td><td>1</td><td>—</td><td>Compact laptop</td></tr>
+      <tr><td>Mobile (Pixel 5)</td><td>375 × 812</td><td>2.75</td><td>✓</td><td>Mobile — <code class="inline">staging-chrome-mobile</code></td></tr>
+    </table>
+  </div>
+
+  <h2 class="sec reveal" id="sweep">The Sweep — 7 × 4 with evidence</h2>
+  <p class="lead reveal">One command logs in as every clinical role at every profile and attaches
+  login + dashboard screenshots to the report — instant visual regression evidence for leadership.</p>
+  <pre class="reveal"><span class="cmt">// Viewports come from the single device matrix — add a profile, it joins the sweep.</span>
+<span class="kw">for</span> (<span class="kw">const</span> viewport <span class="kw">of</span> viewportMatrix) {
+  <span class="kw">for</span> (<span class="kw">const</span> role <span class="kw">of</span> VALIDATED_ROLES) {
+    <span class="fn">test</span>(<span class="str">`[${viewport.name}] ${role} login @smoke`</span>, <span class="kw">async</span> ({ page }, testInfo) =&gt; {
+      <span class="kw">await</span> page.<span class="fn">setViewportSize</span>({ width: viewport.width, height: viewport.height });
+      <span class="kw">await</span> loginPage.<span class="fn">loginAndWaitForHome</span>(user.username, user.password);
+      <span class="kw">await</span> testInfo.<span class="fn">attach</span>(<span class="str">`${role}-${viewport.name}-dashboard`</span>, { path: shot, contentType: <span class="str">'image/png'</span> });
+    });
+  }
+}</pre>
+  <pre class="reveal"><span class="cmd">npm run test:viewports</span>   <span class="cmt"># full 7 × 4 sweep with screenshot evidence</span></pre>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="docker-architecture.html">Next: Docker Architecture →</a></div>
+  </footer>
+</main>
+</body>
+</html>

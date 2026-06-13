@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="System Architecture">
+<title>System Architecture — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Architecture</div>
+    <h1>System Architecture</h1>
+    <p>Tests sit on a layered dependency-injection stack; data flows in from interchangeable
+    sources; results flow out to six reporting channels. Every layer has a single owner and a
+    single responsibility — verified against SOLID, principle by principle.</p>
+  </div>
+
+  <h2 class="sec reveal">Framework Architecture Diagram</h2>
+  <div class="diagram glass reveal" style="padding:16px;text-align:center">
+    <img src="assets/PulseCheck-Framework-Architecture.png"
+         alt="PulseCheck Full Framework Architecture — Triggers → Infrastructure → Core → Data → UI → SUT → Reporting"
+         style="max-width:100%;border-radius:10px;display:block;margin:0 auto">
+    <p style="margin-top:12px;font-size:12px;color:var(--muted)">
+      PulseCheck end-to-end architecture · Triggers → GitHub Actions / Docker → Core (Config, Auth, Runner Manager, Fixture Chain) → Data Layer (SQLite 12-table schema, JSON, ModuleDataService) → UI Abstraction (33 Page Objects, 13 Components, Helpers) → Surgimate (staging / pre-prod / production) → Reporting (Allure · HTML · File logs · ELK · Slack)
+    </p>
+  </div>
+
+  <h2 class="sec reveal" id="fixtures">Layer Explorer — expand each layer</h2>
+  <details class="acc glass reveal" open>
+    <summary>Layer 1 · Base fixtures — execution context</summary>
+    <div class="body">Resolves <code class="inline">testConfig</code> (environment, role, sandbox,
+    base/API URLs) from one registry in <code class="inline">config/environments.ts</code>, driven by
+    <code class="inline">PLAYWRIGHT_ENV / PLAYWRIGHT_ROLE / PLAYWRIGHT_CLIENT</code>. Nothing else in
+    the framework re-derives an environment default — single source of truth.</div>
+  </details>
+  <details class="acc glass reveal">
+    <summary>Layer 2 · Data fixtures — repositories behind interfaces</summary>
+    <div class="body"><code class="inline">userRepository: IUserRepository</code> and
+    <code class="inline">testDataRepository: ITestDataRepository</code> are typed as interfaces (DIP);
+    the concrete backends are named only in this composition root. Includes the pre-resolved
+    <code class="inline">testData</code> bundle and the <code class="inline">moduleData</code> service
+    Swapping the storage backend touches one file.</div>
+  </details>
+  <details class="acc glass reveal">
+    <summary>Layer 3 · Auth fixtures — pre-authenticated, per-role sessions</summary>
+    <div class="body"><code class="inline">authenticatedPage</code> uses cached storageState
+    (one file per role × sandbox × environment). Multi-role tests get concurrent sessions —
+    <code class="inline">coordinatorPage</code> and <code class="inline">surgeonPage</code> side by
+    side in a single test. Auth setup retries 3× and authenticates every available role.</div>
+  </details>
+  <details class="acc glass reveal">
+    <summary>Layer 4 · Page fixtures — POM via factory + components</summary>
+    <div class="body">Page objects constructed through <code class="inline">PageFactory</code> (OCP);
+    widget components (<code class="inline">modal</code>, <code class="inline">toast</code>,
+    <code class="inline">chooserFor</code>) own their selectors and waits. Specs never touch raw CSS.</div>
+  </details>
+  <details class="acc glass reveal">
+    <summary>Page Objects &amp; Components — single-owner locators</summary>
+    <div class="body">33 page classes (Login, Home, Dashboard, Calendar, Agenda + 11 Surgery tabs + 5 Patient tabs + 4 Admin pages + 3 General-Admin pages) compose 13 component wrappers (PrimeNG table, autocomplete chooser, modal, confirmation dialog, tab view, batch-save overlay, toasts, date picker, file upload, toolbar, navbar, quick-finder). The login form, the logout flow, and every flaky widget interaction exist in exactly one place — fix once, fixed everywhere.</div>
+  </details>
+
+  <h2 class="sec reveal" id="solid">SOLID Compliance — verified, not aspirational</h2>
+  <div class="grid c2">
+    <div class="card glass reveal"><h3>S · Single Responsibility</h3><p>The 535-line BasePage god-class
+      (≈100 methods, most with zero callers) was decomposed to a cohesive core. Each component owns one
+      widget; each fixture file owns one DI layer.</p></div>
+    <div class="card glass reveal"><h3>O · Open/Closed</h3><p>New pages join via PageFactory, new data
+      sources via the source registries, new tenants via a data row — no existing code changes.</p></div>
+    <div class="card glass reveal"><h3>L · Liskov Substitution</h3><p>Six compiler-verified signature
+      violations (pages overriding <code class="inline">navigate()</code> incompatibly, chooser
+      repurposing <code class="inline">selectOption</code>) were eliminated. Rule: subclasses add,
+      never repurpose.</p></div>
+    <div class="card glass reveal"><h3>I + D · Interfaces &amp; Inversion</h3><p>Read/write repository
+      contracts segregated; credentials, test data, and runner sources all sit behind injected
+      interfaces — JSON→SQLite or DB→vault migrations are one-file changes.</p></div>
+  </div>
+
+  <h2 class="sec reveal" id="folders">Folder Structure</h2>
+  <pre class="reveal"><span class="cmt">framework/</span>
+├── config/            <span class="cmt">environments.ts · constants.ts · timezone.ts (ET) · browsers.ts · playwright-base.ts · sql-queries.json · module-queries.json</span>
+├── data/              <span class="cmt">test-data.json · builders/ (Patient/Surgery/Insurance/User) · factories/ · runnerlist/RUNMANAGER.json · testdata/ · db/migrations/</span>
+├── testdata/          <span class="cmt">database/inputData.db — master SQLite: users · runmanager · testdata · logindata</span>
+├── database/          <span class="cmt">IDataStore · repositories (user/test-data) · user-sources (db) · module-data service</span>
+├── fixtures/          <span class="cmt">base → data → auth → page (layered DI) · index.ts</span>
+├── pages/             <span class="cmt">BasePage · PageFactory · 33 page classes (surgery/ 11 tabs · patient/ 5 tabs · admin/ 4 · general-admin/ 3)</span>
+├── page-components/   <span class="cmt">13 components: table · chooser · modal · confirmation · tabs · toast · batch-save · date-picker · file-upload · toolbar · navbar · quick-finder</span>
+├── runner/            <span class="cmt">RunnerManager singleton · plan · data-provider · sources (json/db) · normalize</span>
+├── helpers/           <span class="cmt">AuthHelper · ApiSetupHelper · SurgeryHelper · PatientHelper</span>
+├── utilities/         <span class="cmt">StabilityHelper · WaitUtils · DateUtils (ET) · StringUtils · FileUtils</span>
+├── reporters/         <span class="cmt">summary-reporter · file-log-reporter · elk-reporter · slack-reporter</span>
+├── hooks/             <span class="cmt">global-setup.ts · global-teardown.ts · auth.setup.ts (storageState per role × sandbox × env)</span>
+├── tests/             <span class="cmt">e2e/ · smoke/ · regression/ · runner-managed/</span>
+├── scripts/           <span class="cmt">run-matrix.ts · validate-data-layer.ts · validate-runner-manager.ts · generate-runner-data.ts</span>
+├── docker/            <span class="cmt">Dockerfile (playwright:v1.48.0-noble) · docker-compose.yml · docker-compose.ci.yml</span>
+└── .github/workflows/ <span class="cmt">smoke.yml (PR gate) · regression.yml (4-shard nightly)</span></pre>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="execution-flow.html">Next: Execution Lifecycle →</a></div>
+  </footer>
+</main>
+</body>
+</html>

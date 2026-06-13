@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="page-title" content="Execution Lifecycle">
+<title>Execution Lifecycle — Surgimate Automation Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="assets/icons/playwright.svg">
+<script defer src="assets/js/shell.js"></script>
+</head>
+<body>
+<main class="content">
+
+  <div class="page-head reveal">
+    <div class="eyebrow">Architecture</div>
+    <h1>Execution Lifecycle</h1>
+    <p>What actually happens between <code class="inline">npx playwright test</code> and the final
+    report — including the collection-time interception that makes the Runner Manager possible.</p>
+  </div>
+
+  <h2 class="sec reveal">End-to-End Flow</h2>
+  <div class="flow reveal">
+    <div class="step glass"><div class="k">01 · Process</div><h4>Timezone pin</h4><p>config/timezone.ts forces America/New_York before any Date exists — DST-aware ET everywhere.</p></div>
+    <div class="step glass"><div class="k">02 · Config</div><h4>Context resolve</h4><p>env / role / sandbox from one registry; projects get baseURL + storageState via forEnv().</p></div>
+    <div class="step glass"><div class="k">03 · Normalize</div><h4>SQL → JSON</h4><p>SQLite tables compile to canonical RUNMANAGER.json + &lt;ENV&gt;_TestData.json.</p></div>
+    <div class="step glass"><div class="k">04 · Collect</div><h4>Interception</h4><p>defineRunnerSuite drops execute=no, orders by priority, expands count-capped iterations.</p></div>
+  </div>
+  <div class="flow reveal">
+    <div class="step glass"><div class="k">05 · Auth</div><h4>Session cache</h4><p>auth.setup logs in every available role once; storageState per role × sandbox × env.</p></div>
+    <div class="step glass"><div class="k">06 · Inject</div><h4>Fixture stack</h4><p>base → data → auth → page: tests receive repositories, sessions, page objects ready-made.</p></div>
+    <div class="step glass"><div class="k">07 · Execute</div><h4>Parallel run</h4><p>4 workers locally/CI; sharding ×4; runner-managed project runs sequential for priority order.</p></div>
+    <div class="step glass"><div class="k">08 · Report</div><h4>Six channels</h4><p>HTML + Allure + summary.json + action log + Slack + ELK from the same run.</p></div>
+  </div>
+
+  <h2 class="sec reveal" id="tz">Timezone Strategy — everything on Eastern Time</h2>
+  <div class="grid c2">
+    <div class="card glass reveal"><h3>🕓 Node side</h3>
+      <p>One module (<code class="inline">config/timezone.ts</code>) sets <code class="inline">process.env.TZ</code>
+      as a side effect and is the <b>first import of every entrypoint</b>. All generated dates —
+      <code class="inline">today()</code>, <code class="inline">tomorrow()</code>, surgery schedules,
+      report timestamps — mean the application's ET calendar day, regardless of runner locale.
+      Proven on an IST machine: framework clock reports GMT-0400.</p></div>
+    <div class="card glass reveal"><h3>🌐 Browser side</h3>
+      <p>Every context — config projects and manual contexts alike — receives
+      <code class="inline">timezoneId: 'America/New_York'</code>, so the app under test renders ET too.
+      Generated dates and rendered dates can never disagree, even across the EST/EDT switch
+      (IANA zone handles DST automatically).</p></div>
+  </div>
+
+  <h2 class="sec reveal" id="auth">Authentication Lifecycle</h2>
+  <div class="diagram glass reveal">
+    <svg viewBox="0 0 1040 200" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+        <path d="M0,0 L8,4.5 L0,9 z" fill="#A855F7"/></marker></defs>
+      <rect x="20" y="60" width="180" height="80" rx="12" class="dg-tint"/>
+      <text x="110" y="94" text-anchor="middle" class="dg-th">Credentials source</text>
+      <text x="110" y="116" text-anchor="middle" class="dg-tm">SQLite · inputData.db</text>
+      <rect x="250" y="60" width="190" height="80" rx="12" class="dg-box"/>
+      <text x="345" y="88" text-anchor="middle" class="dg-th">auth.setup project</text>
+      <text x="345" y="108" text-anchor="middle" class="dg-tm">LoginPage · 3 retries</text>
+      <text x="345" y="126" text-anchor="middle" class="dg-tm">every available role</text>
+      <rect x="490" y="60" width="230" height="80" rx="12" class="dg-solid"/>
+      <text x="605" y="92" text-anchor="middle" class="dg-tw">storageState cache</text>
+      <text x="605" y="116" text-anchor="middle" fill="#DDD6FE" font-size="12">Role-Sandbox-env.json</text>
+      <rect x="770" y="20" width="250" height="74" rx="12" class="dg-box"/>
+      <text x="895" y="50" text-anchor="middle" class="dg-th">authenticatedPage</text>
+      <text x="895" y="72" text-anchor="middle" class="dg-tm">configured role session</text>
+      <rect x="770" y="112" width="250" height="74" rx="12" class="dg-box"/>
+      <text x="895" y="142" text-anchor="middle" class="dg-th">adminPage · surgeonPage …</text>
+      <text x="895" y="164" text-anchor="middle" class="dg-tm">concurrent multi-role sessions</text>
+      <line x1="200" y1="100" x2="246" y2="100" class="dg-line" marker-end="url(#ar2)"/>
+      <line x1="440" y1="100" x2="486" y2="100" class="dg-line" marker-end="url(#ar2)"/>
+      <line x1="720" y1="84" x2="766" y2="60" class="dg-line" marker-end="url(#ar2)"/>
+      <line x1="720" y1="116" x2="766" y2="146" class="dg-line" marker-end="url(#ar2)"/>
+    </svg>
+  </div>
+  <p class="lead reveal">Login UI interaction lives in exactly one class (<code class="inline">LoginPage</code>);
+  the configured role is mandatory, additional roles are best-effort — so one broken account never
+  blocks the whole run.</p>
+
+  <h2 class="sec reveal" id="env">Environment Management Strategy</h2>
+  <p class="lead reveal">One switch — <code class="inline">PLAYWRIGHT_ENV</code> — retargets six things at once.
+  Environment knowledge lives in a single registry; nothing else hard-codes a URL or default.</p>
+  <div class="tablewrap glass reveal">
+    <table>
+      <tr><th>Environment</th><th>App / API</th><th>Policy</th></tr>
+      <tr><td>staging <span class="pill green">default</span></td><td>app-staging / api-staging .surgimate.com</td><td>Full regression, daily deploys</td></tr>
+      <tr><td>pre-production</td><td>preprod / api-preprod .surgimate.com</td><td>Release-candidate validation</td></tr>
+      <tr><td>production</td><td>app / api .surgimate.com</td><td><span class="pill amber">smoke-only by design</span> — project grep enforces it</td></tr>
+    </table>
+  </div>
+  <div class="grid c3">
+    <div class="card glass reveal"><h3>URLs &amp; projects</h3><p>Base + API URLs resolve from the registry; <code class="inline">BASE_URL</code> can override ad-hoc.</p></div>
+    <div class="card glass reveal"><h3>Data &amp; credentials</h3><p>Every repository row and credential record is environment-scoped — staging tests use staging accounts only.</p></div>
+    <div class="card glass reveal"><h3>Runner &amp; sessions &amp; reports</h3><p>&lt;ENV&gt;_TestData.json selection, per-env auth caches, and env-stamped reports — all from the same switch.</p></div>
+  </div>
+  <pre class="reveal"><span class="cmd">npm run test:staging</span>      <span class="cmt"># default</span>
+<span class="cmd">npm run test:preprod</span>      <span class="cmt"># PLAYWRIGHT_ENV=pre-production</span>
+<span class="cmd">npm run test:prod</span>         <span class="cmt"># production — automatically @smoke only</span>
+<span class="cmd">npx cross-env PLAYWRIGHT_ENV=pre-production PLAYWRIGHT_CLIENT=eCW PLAYWRIGHT_ROLE=Surgeon npm run test:smoke</span></pre>
+
+  <footer class="site">
+    <div>Surgimate Playwright Framework (Koala PulseCheck)</div>
+    <div><a href="data-driven-testing.html">Next: Data-Driven Testing →</a></div>
+  </footer>
+</main>
+</body>
+</html>
